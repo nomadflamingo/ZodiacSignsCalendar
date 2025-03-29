@@ -31,12 +31,12 @@ namespace ZodiacSignsCalendar.Models
                 throw new ArgumentException("Your Date of Birth cannot be in the future");
             }
 
-            if (birthdate.AddYears(135) < today)
+            Age = CalculateAge(birthdate);
+            if (Age > 135)
             {
                 throw new ArgumentException("You cannot be older than 135 years old");
             }
 
-            Age = CalculateAge(birthdate);
             IsBirthday = CheckBirthday(birthdate);
             WesternZodiac = CalculateWesternZodiac(birthdate);
             ChineseZodiac = CalculateChineseZodiac(birthdate);
