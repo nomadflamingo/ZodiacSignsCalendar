@@ -1,51 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ZodiacSignsCalendar.Models
 {
-    internal class UserBirthInfo
+    internal class Person
     {
-        public DateTime? BirthDate { get; set; }
-        public int Age { get; set; }
-        public bool IsBirthday { get; set; }
-        public string WesternZodiac { get; set; }
-        public string ChineseZodiac { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string? Email { get; set; }
+        public DateOnly? BirthDate { get; set; }
 
-        public void CalculateZodiacSign()
+
+        private readonly bool _isAdult;
+        private readonly string _sunSign;
+        private readonly string _chineseSign;
+        private readonly bool _isBirthday;
+        private readonly int _age;
+
+        public bool? IsAdult => _isAdult;
+
+        public string? SunSign => _sunSign;
+
+        public string? ChineseSign => _chineseSign;
+
+        public bool? IsBirthday => _isBirthday;
+
+        public Person(string firstName, string lastName, string? email, DateOnly? birthDate)
         {
-            if (!BirthDate.HasValue)
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            BirthDate = birthDate;
+
+            if (!birthDate.HasValue)
             {
                 throw new NullReferenceException("Birth Date was not selected");
             }
 
-            DateTime today = DateTime.Today;
-            DateTime birthdate = BirthDate.Value;
-
-
-            if (birthdate > today)
+            if (birthDate.Value > DateOnly.FromDateTime(DateTime.Today))
             {
                 throw new ArgumentException("Your Date of Birth cannot be in the future");
             }
 
-            Age = CalculateAge(birthdate);
-            if (Age > 135)
+            int age = CalculateAge(birthDate.Value);
+            if (age > 135)
             {
                 throw new ArgumentException("You cannot be older than 135 years old");
             }
 
-            IsBirthday = CheckBirthday(birthdate);
-            WesternZodiac = CalculateWesternZodiac(birthdate);
-            ChineseZodiac = CalculateChineseZodiac(birthdate);
+            _isAdult = age >= 18;
+            _sunSign = CalculateWesternZodiac(birthDate.Value);
+            _chineseSign = CalculateChineseZodiac(birthDate.Value);
+            _isBirthday = CheckBirthday(birthDate.Value);
         }
 
-        private int CalculateAge(DateTime birthdate)
+        public Person(string firstName, string lastName, string email)
+        : this(firstName, lastName, email, null)
+        {
+        }
+
+        public Person(string firstName, string lastName, DateOnly birthDate)
+        : this(firstName, lastName, null, birthDate)
+        {
+        }
+
+        private int CalculateAge(DateOnly birthdate)
         {
             // Save today's date
-            DateTime today = DateTime.Today;
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
             // Calculate the age
             int age = today.Year - birthdate.Year;
@@ -59,12 +85,12 @@ namespace ZodiacSignsCalendar.Models
             return age;
         }
 
-        private bool CheckBirthday(DateTime birthdate)
+        private bool CheckBirthday(DateOnly birthdate)
         {
             return DateTime.Today.ToString("MMdd") == birthdate.ToString("MMdd");
         }
 
-        private string CalculateWesternZodiac(DateTime birthdate)
+        private string CalculateWesternZodiac(DateOnly birthdate)
         {
 
             int day = birthdate.Day;
@@ -86,7 +112,7 @@ namespace ZodiacSignsCalendar.Models
             return "Unknown";
         }
 
-        private string CalculateChineseZodiac(DateTime birthdate)
+        private string CalculateChineseZodiac(DateOnly birthdate)
         {
 
             int year = birthdate.Year;
