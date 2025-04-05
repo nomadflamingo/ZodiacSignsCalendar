@@ -5,11 +5,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using ZodiacSignsCalendar.Exceptions;
 
 namespace ZodiacSignsCalendar.Models
 {
     internal class Person
     {
+        private const int MaximumAge = 135;
+
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string? Email { get; set; }
@@ -43,13 +46,13 @@ namespace ZodiacSignsCalendar.Models
 
             if (birthDate.Value > DateOnly.FromDateTime(DateTime.Today))
             {
-                throw new ArgumentException("Your Date of Birth cannot be in the future");
+                throw new FutureBirthDateException();
             }
 
             int age = CalculateAge(birthDate.Value);
-            if (age > 135)
+            if (age > MaximumAge)
             {
-                throw new ArgumentException("You cannot be older than 135 years old");
+                throw new TooOldBirthDateException();
             }
 
             if (!string.IsNullOrWhiteSpace(email))
@@ -57,7 +60,7 @@ namespace ZodiacSignsCalendar.Models
                 // email was entered, we need to make sure it's corrrect
                 if (!EmailIsCorrect(email))
                 {
-                    throw new ArgumentException("Email address should be in a valid format");
+                    throw new InvalidEmailException();
                 }
             }
 
