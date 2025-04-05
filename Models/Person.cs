@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
@@ -19,7 +20,6 @@ namespace ZodiacSignsCalendar.Models
         private readonly string _sunSign;
         private readonly string _chineseSign;
         private readonly bool _isBirthday;
-        private readonly int _age;
 
         public bool? IsAdult => _isAdult;
 
@@ -52,6 +52,15 @@ namespace ZodiacSignsCalendar.Models
                 throw new ArgumentException("You cannot be older than 135 years old");
             }
 
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                // email was entered, we need to make sure it's corrrect
+                if (!EmailIsCorrect(email))
+                {
+                    throw new ArgumentException("Email address should be in a valid format");
+                }
+            }
+
             _isAdult = age >= 18;
             _sunSign = CalculateWesternZodiac(birthDate.Value);
             _chineseSign = CalculateChineseZodiac(birthDate.Value);
@@ -68,7 +77,13 @@ namespace ZodiacSignsCalendar.Models
         {
         }
 
-        private int CalculateAge(DateOnly birthdate)
+        private static bool EmailIsCorrect(string email)
+        {
+            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            return Regex.IsMatch(email, emailPattern);
+        }
+
+        private static int CalculateAge(DateOnly birthdate)
         {
             // Save today's date
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -85,12 +100,12 @@ namespace ZodiacSignsCalendar.Models
             return age;
         }
 
-        private bool CheckBirthday(DateOnly birthdate)
+        private static bool CheckBirthday(DateOnly birthdate)
         {
             return DateTime.Today.ToString("MMdd") == birthdate.ToString("MMdd");
         }
 
-        private string CalculateWesternZodiac(DateOnly birthdate)
+        private static string CalculateWesternZodiac(DateOnly birthdate)
         {
 
             int day = birthdate.Day;
@@ -112,7 +127,7 @@ namespace ZodiacSignsCalendar.Models
             return "Unknown";
         }
 
-        private string CalculateChineseZodiac(DateOnly birthdate)
+        private static string CalculateChineseZodiac(DateOnly birthdate)
         {
 
             int year = birthdate.Year;
