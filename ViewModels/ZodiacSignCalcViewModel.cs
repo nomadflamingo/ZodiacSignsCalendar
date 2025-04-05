@@ -240,7 +240,6 @@ namespace ZodiacSignsCalendar.ViewModels
                 // Generate messages
                 await Task.Run(() =>
                 {
-                    Task.Delay(2000).Wait();
                     DateOnly birthDate = DateOnly.FromDateTime(SelectedDate.Value);
                     Person person = new Person(FirstName, LastName, Email, birthDate);
 
